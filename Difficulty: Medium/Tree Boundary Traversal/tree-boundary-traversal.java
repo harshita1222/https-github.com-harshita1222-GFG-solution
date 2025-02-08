@@ -76,82 +76,89 @@ class GFG {
             for (Integer num : res) System.out.print(num + " ");
             System.out.println();
             t--;
+
+            System.out.println("~");
         }
     }
 }
 
 // } Driver Code Ends
 
+
+// User function Template for Java
+/*
+class Node
+{
+    int data;
+    Node left, right;
+
+    public Node(int d)
+    {
+        data = d;
+        left = right = null;
+    }
+}
+*/
+
 class Solution {
+    List<Integer> leftBoundary = new ArrayList<>();
+    List<Integer> rightBoundary = new ArrayList<>();
+    List<Integer> leafNodes = new ArrayList<>();
     ArrayList<Integer> boundaryTraversal(Node node) {
         // code here
-        ArrayList<Integer> ans = new ArrayList<Integer>();
-        Stack<Integer> stack = new Stack<>();
-        
-        ans.add(node.data);
-        
-        // if there is a single node, then root will be added 2 times(here above and during leaf traversal) if we don't return here. 
-        if(node.left == null && node.right == null ){
-            return ans;
-        }
-
-        
-        leftT(node.left,ans);
-        leafT(node, ans);
-        rightT(node.right,stack);
-        
-        while(!stack.isEmpty()){
-            ans.add(stack.pop());
-        }
-        
-        return ans;
-        
+        leftBoundary.add(node.data);
+        populateLeftBoundary(node.left);
+        populateRightBoundary(node.right);
+        ArrayList<Integer> result = new ArrayList<>();
+        result.addAll(leftBoundary);
+        result.addAll(leafNodes);
+        result.addAll(rightBoundary);
+        return result;
     }
     
-    void leftT(Node root, ArrayList<Integer> ans ){
-        if(root == null) return ;
-        
-        if(root.left == null && root.right == null ){
+    void populateLeftBoundary(Node node) {
+        if (node == null) {
             return;
         }
-        
-        ans.add(root.data);
-        
-        if(root.left !=null){
-            leftT(root.left, ans);
-        }else if(root.right != null) {
-            leftT(root.right, ans);
-        }
-        
-    }
-    
-    void leafT(Node root, ArrayList<Integer> ans ){
-        if(root == null) return;
-        
-        if(root.left == null && root.right == null ){
-            ans.add(root.data);
+        if (node.left == null && node.right == null) {
+            leafNodes.add(node.data);
             return;
         }
-        
-        leafT(root.left, ans);
-        leafT(root.right, ans);
-        
+        leftBoundary.add(node.data);
+        if (node.left != null) {
+            populateLeftBoundary(node.left);
+            populateLeafNodes(node.right);
+        } else {
+            populateLeftBoundary(node.right);
+        }
     }
     
-    void rightT(Node root, Stack<Integer> stack ){
-        if(root == null) return ;
-        
-        if(root.left == null && root.right == null ){
+    void populateLeafNodes(Node node) {
+        if (node == null) {
             return;
         }
-        
-        stack.add(root.data);
-        
-        if(root.right !=null){
-            rightT(root.right, stack);
-        } else if(root.left != null){
-            rightT(root.left, stack);
+        if (node.left == null && node.right == null) {
+            leafNodes.add(node.data);
+            return;
         }
+        populateLeafNodes(node.left);
+        populateLeafNodes(node.right);
     }
     
+    void populateRightBoundary(Node node) {
+        if (node == null) {
+            return;
+        }
+        if (node.left == null && node.right == null) {
+            leafNodes.add(node.data);
+            return;
+        }
+        if (node.right != null) {
+            populateLeafNodes(node.left);
+            populateRightBoundary(node.right);
+        } else {
+            populateRightBoundary(node.left);
+        }
+        rightBoundary.add(node.data);
+    }
 }
